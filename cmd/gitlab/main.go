@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"io"
 	"os"
 	"strings"
@@ -25,11 +26,13 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
+	ctx := context.Background()
 	rootCmd.PersistentFlags().StringVarP(&configData.Token, "token", "t", "", "GitLab API token")
 	rootCmd.PersistentFlags().StringVarP(&configData.BaseURL, "url", "u", "https://gitlab.skead.no", "GitLab instance URL")
 	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debug logging")
 	cobra.OnInitialize(initLogger, initClient)
-	rootCmd.AddCommand(todo.NewTodoCmd(&configData))
+	ctx = config.WithConfig(ctx, &configData)
+	rootCmd.AddCommand(todo.NewTodoCmd(ctx))
 }
 
 func initLogger() {
