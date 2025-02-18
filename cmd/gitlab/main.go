@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"toolbox/cmd/gitlab/mr"
 	"toolbox/cmd/gitlab/todo"
 	"toolbox/internal/config"
 
@@ -33,6 +34,7 @@ func init() {
 	cobra.OnInitialize(initLogger, initClient)
 	ctx = config.WithConfig(ctx, &configData)
 	rootCmd.AddCommand(todo.NewTodoCmd(ctx))
+	rootCmd.AddCommand(mr.NewMRCmd(ctx))
 }
 
 func initLogger() {

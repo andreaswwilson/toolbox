@@ -1,14 +1,24 @@
 package todo
 
 import (
+	"context"
+	"log/slog"
+	"os"
 	"testing"
 	"time"
+	"toolbox/internal/config"
 
 	"github.com/stretchr/testify/assert"
 	gitlab "gitlab.com/gitlab-org/api/client-go"
 )
 
 func TestShouldMarkTodoAsDone(t *testing.T) {
+	// Create a cxt with a debug logger
+	ctx := context.Background()
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	configData := &config.Config{Logger: logger}
+	ctx = context.WithValue(ctx, config.ConfigKey, configData)
+
 	t.Parallel()
 	tests := []struct {
 		name         string
@@ -83,7 +93,7 @@ func TestShouldMarkTodoAsDone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			result := shouldMarkTodoAsDone(tt.todo, tt.mergeRequest)
+			result := shouldMarkTodoAsDone(ctx, tt.todo, tt.mergeRequest)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
